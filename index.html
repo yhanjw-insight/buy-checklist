@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>스윙 매수 체크리스트</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --text: #1b1f24;
+    --muted: #5f6b7a;
+    --border: #d8dde3;
+    --accent: #2563eb;
+    --accent-text: #ffffff;
+    --check-bg: #eef3ff;
+    --danger: #c62828;
+    --grade-a: #1b873f;
+    --grade-b: #b7791f;
+    --grade-c: #c62828;
+    --grade-text: #ffffff;
+    --focus: #2563eb;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1216;
+      --surface: #1a1f26;
+      --text: #e6e9ed;
+      --muted: #9aa5b1;
+      --border: #2e3640;
+      --accent: #4f8cff;
+      --accent-text: #0f1216;
+      --check-bg: #1e2a40;
+      --danger: #ff6b6b;
+      --grade-a: #3ccf6e;
+      --grade-b: #f0b429;
+      --grade-c: #ff6b6b;
+      --grade-text: #0f1216;
+      --focus: #4f8cff;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    line-height: 1.5;
+  }
+
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  h1 { font-size: 1.4rem; margin: 8px 0 16px; }
+  h2 { font-size: 1.1rem; margin: 0 0 12px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  label.field { display: block; font-weight: 600; margin-bottom: 6px; }
+
+  input[type="text"] {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 1rem;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .checklist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+
+  .checklist label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .checklist input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    accent-color: var(--accent);
+  }
+
+  .checklist input:checked + span { font-weight: 600; }
+  .checklist label:has(input:checked) { background: var(--check-bg); border-color: var(--accent); }
+
+  .result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .score { font-size: 1.6rem; font-weight: 700; }
+  .score small { font-size: 1rem; color: var(--muted); font-weight: 400; }
+
+  .grade {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--grade-text);
+  }
+  .grade-A { background: var(--grade-a); }
+  .grade-B { background: var(--grade-b); }
+  .grade-C { background: var(--grade-c); }
+
+  .hint { color: var(--muted); font-size: 0.875rem; margin: 8px 0 0; }
+
+  .actions { display: flex; gap: 8px; margin-top: 16px; }
+
+  button {
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  button.primary {
+    flex: 1;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-text);
+  }
+
+  button.danger { color: var(--danger); border-color: var(--danger); background: transparent; }
+
+  .message { min-height: 1.5em; margin: 8px 0 0; font-size: 0.9rem; color: var(--muted); }
+  .message.error { color: var(--danger); }
+
+  .records { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+
+  .record {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 8px 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .record .info { flex: 1; min-width: 0; }
+  .record .name { font-weight: 600; overflow-wrap: anywhere; }
+  .record .meta { color: var(--muted); font-size: 0.875rem; }
+  .record .grade { min-width: 36px; height: 36px; font-size: 1rem; }
+
+  .empty { color: var(--muted); text-align: center; padding: 16px 0; margin: 0; }
+
+  @media (min-width: 640px) {
+    main { padding: 24px; }
+    h1 { font-size: 1.75rem; }
+    .checklist { grid-template-columns: 1fr 1fr; }
+    .actions { justify-content: flex-end; }
+    button.primary { flex: none; min-width: 160px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>스윙 매수 체크리스트</h1>
+
+  <section class="card">
+    <label class="field" for="stock">종목명</label>
+    <input type="text" id="stock" placeholder="예: 삼성전자" maxlength="40" autocomplete="off">
+  </section>
+
+  <section class="card">
+    <h2>체크 항목</h2>
+    <ul class="checklist" id="checklist"></ul>
+  </section>
+
+  <section class="card" aria-live="polite">
+    <div class="result">
+      <div class="score"><span id="score">0</span><small> / 8점</small></div>
+      <span class="grade grade-C" id="grade">C</span>
+    </div>
+    <p class="hint">등급 기준: A 7~8점 · B 5~6점 · C 0~4점</p>
+    <div class="actions">
+      <button type="button" id="reset">초기화</button>
+      <button type="button" class="primary" id="save">기록 저장</button>
+    </div>
+    <p class="message" id="message" role="status"></p>
+  </section>
+
+  <section class="card">
+    <h2>저장된 기록</h2>
+    <ul class="records" id="records"></ul>
+  </section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'buy-checklist:records';
+  var STORAGE_VERSION = 1;
+
+  var ITEMS = [
+    '추세 (20일선 위)',
+    '거래량 증가',
+    '실적 개선',
+    '업종 강세',
+    '손절가 설정',
+    '손익비 2:1 이상',
+    '시장 상황 양호',
+    '뉴스 리스크 확인'
+  ];
+
+  var stockInput = document.getElementById('stock');
+  var checklistEl = document.getElementById('checklist');
+  var scoreEl = document.getElementById('score');
+  var gradeEl = document.getElementById('grade');
+  var messageEl = document.getElementById('message');
+  var recordsEl = document.getElementById('records');
+
+  var records = loadRecords();
+
+  // 점수에 따른 등급: A 7~8, B 5~6, C 0~4
+  function gradeOf(score) {
+    if (score >= 7) return 'A';
+    if (score >= 5) return 'B';
+    return 'C';
+  }
+
+  function todayString() {
+    var d = new Date();
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    var dd = String(d.getDate()).padStart(2, '0');
+    return d.getFullYear() + '-' + mm + '-' + dd;
+  }
+
+  function isValidRecord(r) {
+    return r && typeof r === 'object' &&
+      typeof r.name === 'string' &&
+      typeof r.date === 'string' &&
+      typeof r.score === 'number' && r.score >= 0 && r.score <= ITEMS.length;
+  }
+
+  // 저장 형식: { version, records: [...] }
+  // 버전 정보 없는 배열 형식이 들어 있어도 읽어서 새 형식으로 옮긴다.
+  function loadRecords() {
+    var raw = null;
+    try {
+      raw = localStorage.getItem(STORAGE_KEY);
+    } catch (e) {
+      return [];
+    }
+    if (!raw) return [];
+
+    var data;
+    try {
+      data = JSON.parse(raw);
+    } catch (e) {
+      return [];
+    }
+
+    var list = Array.isArray(data) ? data : (data && Array.isArray(data.records) ? data.records : []);
+    return list.filter(isValidRecord).map(function (r, i) {
+      return {
+        id: typeof r.id === 'string' ? r.id : 'r' + Date.now() + '-' + i,
+        date: r.date,
+        name: r.name,
+        score: r.score
+      };
+    });
+  }
+
+  function persistRecords() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: STORAGE_VERSION, records: records }));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function showMessage(text, isError) {
+    messageEl.textContent = text;
+    messageEl.className = 'message' + (isError ? ' error' : '');
+  }
+
+  function currentScore() {
+    return checklistEl.querySelectorAll('input[type="checkbox"]:checked').length;
+  }
+
+  function setGradeBadge(el, grade) {
+    el.textContent = grade;
+    el.className = 'grade grade-' + grade;
+  }
+
+  function updateScore() {
+    var score = currentScore();
+    scoreEl.textContent = String(score);
+    setGradeBadge(gradeEl, gradeOf(score));
+  }
+
+  function renderChecklist() {
+    ITEMS.forEach(function (text, i) {
+      var li = document.createElement('li');
+      var label = document.createElement('label');
+      var input = document.createElement('input');
+      var span = document.createElement('span');
+      input.type = 'checkbox';
+      input.id = 'item-' + i;
+      span.textContent = text;
+      label.appendChild(input);
+      label.appendChild(span);
+      li.appendChild(label);
+      checklistEl.appendChild(li);
+    });
+    checklistEl.addEventListener('change', updateScore);
+  }
+
+  function renderRecords() {
+    recordsEl.textContent = '';
+    if (records.length === 0) {
+      var empty = document.createElement('li');
+      empty.className = 'empty';
+      empty.textContent = '아직 저장된 기록이 없습니다.';
+      recordsEl.appendChild(empty);
+      return;
+    }
+
+    records.forEach(function (r) {
+      var li = document.createElement('li');
+      li.className = 'record';
+
+      var badge = document.createElement('span');
+      setGradeBadge(badge, gradeOf(r.score));
+
+      var info = document.createElement('div');
+      info.className = 'info';
+      var name = document.createElement('div');
+      name.className = 'name';
+      name.textContent = r.name;
+      var meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = r.date + ' · ' + r.score + ' / ' + ITEMS.length + '점';
+      info.appendChild(name);
+      info.appendChild(meta);
+
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'danger';
+      del.textContent = '삭제';
+      del.setAttribute('aria-label', r.date + ' ' + r.name + ' 기록 삭제');
+      del.dataset.id = r.id;
+
+      li.appendChild(badge);
+      li.appendChild(info);
+      li.appendChild(del);
+      recordsEl.appendChild(li);
+    });
+  }
+
+  function resetForm() {
+    stockInput.value = '';
+    checklistEl.querySelectorAll('input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
+    updateScore();
+  }
+
+  document.getElementById('save').addEventListener('click', function () {
+    var name = stockInput.value.trim();
+    if (!name) {
+      showMessage('종목명을 입력해 주세요.', true);
+      stockInput.focus();
+      return;
+    }
+    var record = {
+      id: 'r' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+      date: todayString(),
+      name: name,
+      score: currentScore()
+    };
+    records.unshift(record);
+    renderRecords();
+    if (persistRecords()) {
+      showMessage(name + ' 기록을 저장했습니다.', false);
+    } else {
+      showMessage('브라우저 저장소에 저장하지 못했습니다. 새로고침하면 기록이 사라질 수 있습니다.', true);
+    }
+    resetForm();
+  });
+
+  document.getElementById('reset').addEventListener('click', function () {
+    resetForm();
+    showMessage('', false);
+  });
+
+  recordsEl.addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-id]');
+    if (!btn) return;
+    var id = btn.dataset.id;
+    records = records.filter(function (r) { return r.id !== id; });
+    renderRecords();
+    if (!persistRecords()) {
+      showMessage('브라우저 저장소에 반영하지 못했습니다.', true);
+    }
+  });
+
+  renderChecklist();
+  updateScore();
+  renderRecords();
+})();
+</script>
+</body>
+</html>
